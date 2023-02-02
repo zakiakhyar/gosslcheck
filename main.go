@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"database/sql"
+	"encoding/csv"
 	"fmt"
 	"os"
 	"time"
@@ -29,8 +30,19 @@ func main() {
 	}
 	defer rows.Close()
 
-	var host string
+	file, err := os.Create("cekssl-report.csv")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
 
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	header := []string{"Domain", "Expired", "Sisa (Hari)"}
+	writer.Write(header)
+
+	var host string
 	for rows.Next() {
 		err := rows.Scan(&host)
 		if err != nil {
@@ -46,6 +58,10 @@ func main() {
 		expiredate := cert.NotAfter.Format("02/01/2006")
 		durasi := cert.NotAfter.Sub(time.Now())
 		sisahari := int(durasi.Round(24*time.Hour).Hours() / 24)
-		fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari")
+
+		record := []string{host, expiredate, fmt.Sprint(sisahari)}
+		writer.Write(record)
+
+		//fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari")
 	}
 }
