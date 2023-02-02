@@ -8,7 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func main() {
+func onehost() {
 	host := "kejati-aceh.kejaksaan.go.id"
 	port := 443
 
