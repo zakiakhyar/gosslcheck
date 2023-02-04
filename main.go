@@ -25,12 +25,14 @@ func main() {
 
 	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbuser, dbpass, hostdb, portdb, dbname))
 	if err != nil {
+		fmt.Println("Tidak berhasil koneksi ke Database")
 		panic(err)
 	}
 	defer db.Close()
 
 	rows, err := db.Query("SELECT domain FROM domain")
 	if err != nil {
+		fmt.Println("Tidak berhasil koneksi ke Database")
 		panic(err)
 	}
 	defer rows.Close()
