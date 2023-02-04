@@ -32,7 +32,6 @@ func main() {
 
 	rows, err := db.Query("SELECT domain FROM domain")
 	if err != nil {
-		fmt.Println("Tidak berhasil koneksi ke Database")
 		panic(err)
 	}
 	defer rows.Close()
