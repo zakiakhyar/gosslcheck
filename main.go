@@ -17,8 +17,13 @@ func main() {
 	if err != nil {
 		fmt.Println("Error loading .env file")
 	}
-	pass := os.Getenv("DB_PASSWORD")
-	db, err := sql.Open("mysql", fmt.Sprintf("cekssl:%s@tcp(127.0.0.1:3308)/cekssl", pass))
+	hostdb := os.Getenv("HOST_DB")
+	dbuser := os.Getenv("DB_USERNAME")
+	dbpass := os.Getenv("DB_PASSWORD")
+	portdb := os.Getenv("PORT_DB")
+	dbname := os.Getenv("DB_NAME")
+
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbuser, dbpass, hostdb, portdb, dbname))
 	if err != nil {
 		panic(err)
 	}
@@ -62,6 +67,6 @@ func main() {
 		record := []string{host, expiredate, fmt.Sprint(sisahari)}
 		writer.Write(record)
 
-		//fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari")
+		fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari")
 	}
 }
