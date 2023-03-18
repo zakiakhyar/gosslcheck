@@ -57,9 +57,16 @@ func main() {
 			panic(err)
 		}
 
+<<<<<<< HEAD
 		wg.Add(1)
 		go func(host string) {
 			defer wg.Done()
+=======
+		cert := conn.ConnectionState().PeerCertificates[0]
+		expiredate := cert.NotAfter.Format("02/01/2006")
+		durasi := time.Until(cert.NotAfter)
+		sisahari := int(durasi.Round(24*time.Hour).Hours() / 24)
+>>>>>>> 04e68f8b69b52ee9f67f33883fc1e01cf011bc77
 
 			conn, err := tls.Dial("tcp", fmt.Sprintf("%s:443", host), nil)
 			if err != nil {

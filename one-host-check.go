@@ -22,7 +22,7 @@ func onehost() {
 	//fmt.Println("Subject:", cert.Subject)
 	//fmt.Println("Issuer: ", cert.Issuer)
 	expiredate := cert.NotAfter.Format("02/01/2006")
-	duration := cert.NotAfter.Sub(time.Now())
+	duration := time.Until(cert.NotAfter)
 	hari := duration.Round(24*time.Hour).Hours() / 24
 	//fmt.Println(host, "Expires:", expiredate, "in", hari, "days")
 	fmt.Printf("%s,%s,%.0f\n", host, expiredate, hari)
