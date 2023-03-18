@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"net"
 	"os"
 	"sync"
 	"time"
@@ -46,38 +47,37 @@ func main() {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	header := []string{"Domain", "Expired", "Sisa (Hari)"}
+	header := []string{"Domain", "Expired", "Sisa (Hari)", "IP Address"}
 	writer.Write(header)
 
 	var wg sync.WaitGroup
+	results := make(chan []string, 100)
+
 	for rows.Next() {
 		var host string
 		err := rows.Scan(&host)
 		if err != nil {
 			panic(err)
 		}
+		conn, err := tls.Dial("tcp", fmt.Sprintf("%s:443", host), nil)
+		if err != nil {
+			continue
+		}
+		defer conn.Close()
 
-		wg.Add(1)
-		go func(host string) {
-			defer wg.Done()
+		ips, err := net.LookupHost(host)
+		if err != nil {
+			continue
+		}
 
-			conn, err := tls.Dial("tcp", fmt.Sprintf("%s:443", host), nil)
-			if err != nil {
-				return
-			}
-			defer conn.Close()
+		cert := conn.ConnectionState().PeerCertificates[0]
+		expiredate := cert.NotAfter.Format("02/01/2006")
+		durasi := cert.NotAfter.Sub(time.Now())
+		sisahari := int(durasi.Round(24*time.Hour).Hours() / 24)
 
-			cert := conn.ConnectionState().PeerCertificates[0]
-			expiredate := cert.NotAfter.Format("02/01/2006")
-			durasi := cert.NotAfter.Sub(time.Now())
-			sisahari := int(durasi.Round(24*time.Hour).Hours() / 24)
+		record := []string{host, expiredate, fmt.Sprint(sisahari), ips[0]}
+		writer.Write(record)
 
-			record := []string{host, expiredate, fmt.Sprint(sisahari)}
-			writer.Write(record)
-
-			fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari")
-		}(host)
+		fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari", "IP Address : ", ips)
 	}
-	wg.Wait()
-	fmt.Println("Selesai")
 }
