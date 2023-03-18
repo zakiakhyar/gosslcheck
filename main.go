@@ -62,7 +62,7 @@ func main() {
 
 		cert := conn.ConnectionState().PeerCertificates[0]
 		expiredate := cert.NotAfter.Format("02/01/2006")
-		durasi := cert.NotAfter.Sub(time.Now())
+		durasi := time.Until(cert.NotAfter)
 		sisahari := int(durasi.Round(24*time.Hour).Hours() / 24)
 
 		record := []string{host, expiredate, fmt.Sprint(sisahari)}
