@@ -33,6 +33,7 @@ func main() {
 	defer func(db *sql.DB) {
 		err := db.Close()
 		if err != nil {
+			panic(err)
 		}
 	}(db)
 
@@ -43,6 +44,7 @@ func main() {
 	defer func(rows *sql.Rows) {
 		err := rows.Close()
 		if err != nil {
+			panic(err)
 		}
 	}(rows)
 
@@ -53,6 +55,7 @@ func main() {
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
+			panic(err)
 		}
 	}(file)
 
@@ -84,6 +87,7 @@ func main() {
 			defer func(conn *tls.Conn) {
 				err := conn.Close()
 				if err != nil {
+					return
 				}
 			}(conn)
 
