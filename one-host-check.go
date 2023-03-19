@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -10,9 +11,7 @@ import (
 
 func onehost() {
 	host := "kejati-aceh.kejaksaan.go.id"
-	port := 443
-
-	conn, err := tls.Dial("tcp", fmt.Sprintf("%s:%d", host, port), nil)
+	conn, err := tls.Dial("tcp", net.JoinHostPort(host, "443"), nil)
 	if err != nil {
 		panic(err)
 	}
