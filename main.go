@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
+	"net"
 	"os"
 	"sync"
 	"time"
@@ -76,7 +77,7 @@ func main() {
 		go func(host string) {
 			defer wg.Done()
 
-			conn, err := tls.Dial("tcp", fmt.Sprintf("%s:443", host), nil)
+			conn, err := tls.Dial("tcp", net.JoinHostPort(host, "443"), nil)
 			if err != nil {
 				return
 			}
@@ -103,3 +104,6 @@ func main() {
 	wg.Wait()
 	fmt.Println("Selesai")
 }
+
+//TODO
+// Create make file and service to linux
