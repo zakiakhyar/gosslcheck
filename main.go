@@ -109,5 +109,4 @@ func main() {
 	fmt.Println("Selesai")
 }
 
-//TODO
-// Create make file and service to linux
+// TODO Create make file and service to linux
