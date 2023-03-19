@@ -29,25 +29,40 @@ func main() {
 		fmt.Println("Tidak berhasil koneksi ke Database")
 		panic(err)
 	}
-	defer db.Close()
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+		}
+	}(db)
 
 	rows, err := db.Query("SELECT domain FROM domain")
 	if err != nil {
 		panic(err)
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+		}
+	}(rows)
 
 	file, err := os.Create("cekssl-report.csv")
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+		}
+	}(file)
 
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
 	header := []string{"Domain", "Expired", "Sisa (Hari)"}
-	writer.Write(header)
+	err = writer.Write(header)
+	if err != nil {
+		return
+	}
 
 	var wg sync.WaitGroup
 	for rows.Next() {
@@ -65,7 +80,11 @@ func main() {
 			if err != nil {
 				return
 			}
-			defer conn.Close()
+			defer func(conn *tls.Conn) {
+				err := conn.Close()
+				if err != nil {
+				}
+			}(conn)
 
 			cert := conn.ConnectionState().PeerCertificates[0]
 			expiredate := cert.NotAfter.Format("02/01/2006")
@@ -73,7 +92,10 @@ func main() {
 			sisahari := int(durasi.Round(24*time.Hour).Hours() / 24)
 
 			record := []string{host, expiredate, fmt.Sprint(sisahari)}
-			writer.Write(record)
+			err = writer.Write(record)
+			if err != nil {
+				return
+			}
 
 			fmt.Println(host, "Expired:", expiredate, "sisa", sisahari, "hari")
 		}(host)
